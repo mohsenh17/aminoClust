@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=1:10:00
+#SBATCH --time=00:10:00
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=a100_1g.5gb:1
 #SBATCH --cpus-per-task=1
