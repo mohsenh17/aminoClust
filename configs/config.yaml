@@ -1,0 +1,14 @@
+base:
+  train_dir: data/output.txt
+  checkpoint_dir: checkpoints
+
+model:
+  name: aminoClust_21
+  input_dim: 1024
+  num_clusters: 21
+  num_epochs: 200
+  batch_size: 32
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  latent_dim: 128
+  dropout: 0.5
