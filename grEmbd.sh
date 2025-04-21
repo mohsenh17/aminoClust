@@ -6,5 +6,5 @@
 #SBATCH --mem=8G
 #SBATCH --output=slurm_output/train-%j.out  #%j for jobID
 
-source /home/mohsenh/projects/def-ilie/mohsenh//ENV/prostT5/bin/activate
+source /home/mohsenh/projects/def-ilie/mohsenh//ENV/prostt5ENV/bin/activate
 python amino_clust.py
