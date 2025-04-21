@@ -215,7 +215,7 @@ for epoch in range(epochs):
     # Save best model
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
-        torch.save(model.state_dict(), f"{config['base']['checkpoint']}/{config['model']['modelname']}.pth")
+        torch.save(model.state_dict(), f"{config['base']['checkpoint_dir']}/{config['model']['name']}.pth")
         saved = "(saved)"
     else:
         saved = ""
