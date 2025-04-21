@@ -28,12 +28,27 @@ class ProteinDataset(Dataset):
         embedding_tensor = torch.tensor(embeddings, dtype=torch.float32)  # (L, 1024)
         return embedding_tensor
 
+
+def protein_collate_fn(batch):
+    batch_padded = []
+    for protein in batch:
+        length = protein.shape[0]
+        if length >= MAX_LENGTH:
+            padded = protein[:MAX_LENGTH]  # truncate
+        else:
+            pad_size = MAX_LENGTH - length
+            padding = torch.zeros((pad_size, EMBED_DIM))
+            padded = torch.cat([protein, padding], dim=0)
+        batch_padded.append(padded)
+
+    return torch.stack(batch_padded)  # shape: (batch_size, 800, 1024)
+
 if __name__ == "__main__":
     # Example usage
     data_dir = "data"
     dataset = ProteinDataset(data_dir)
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=protein_collate_fn)
+
     for batch in dataloader:
-        embeddings, aa_sequence = batch  # embeddings: (1, L, 1024), aa_sequence: list of lists
-        print(embeddings.shape, aa_sequence)
+        print(batch.shape)  # torch.Size([32, 800, 1024])
         break
