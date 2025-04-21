@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, TensorDataset, random_split
-from dataloader import (ProteinDataset, protein_collate_fn,
-                        AminoAcidDataset)
+from torch.utils.data import DataLoader, TensorDataset, random_split
+import yaml
+
+with open("configs/config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 
 class VectorQuantizer(nn.Module):
@@ -132,22 +134,22 @@ class VQVAE(nn.Module):
 
 
 
-latent_dim = 100  # latent space dimension
-num_embeddings = 21  # each embedding can represent a unique cluster or cell type
-input_dim = 1024
+latent_dim = config['model']['latent_dim']  # latent space dimension
+num_embeddings = config['model']['num_clusters']  # each embedding can represent a unique cluster or cell type
+input_dim = config['model']['input_dim']
 model = VQVAE(input_dim=input_dim, latent_dim=latent_dim, num_embeddings=num_embeddings)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=config['model']['learning_rate'])
 criterion = nn.MSELoss()
 
 
 model.train()
-epochs = 100
+epochs = config['model']['num_epochs']
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 model.to(device)
 
 embeddings = []
-data_dir = 'data/output_10.txt'
+data_dir = config['base']['train_dir']
 for line in open(data_dir, 'r'):
     line = line.strip()
     if not line:
@@ -213,7 +215,7 @@ for epoch in range(epochs):
     # Save best model
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
-        torch.save(model.state_dict(), "models/best_model.pth")
+        torch.save(model.state_dict(), f"{config['base']['checkpoint']}/{config['model']['modelname']}.pth")
         saved = "(saved)"
     else:
         saved = ""
