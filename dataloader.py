@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, random_split
 import os
 
 MAX_LENGTH = 800
@@ -46,9 +46,19 @@ def protein_collate_fn(batch):
 if __name__ == "__main__":
     # Example usage
     data_dir = "data"
-    dataset = ProteinDataset(data_dir)
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=protein_collate_fn)
+    full_dataset = ProteinDataset(data_dir)
+    total_len = len(full_dataset)
+    train_len = int(0.8 * total_len)
+    val_len = int(0.1 * total_len)
+    test_len = total_len - train_len - val_len
 
-    for batch in dataloader:
+    generator1 = torch.Generator().manual_seed(42)
+    train_ds, val_ds, test_ds = random_split(full_dataset, [train_len, val_len, test_len], 
+                                             generator=generator1)
+
+    train_loader = DataLoader(train_ds, batch_size=32, shuffle=True, collate_fn=protein_collate_fn)
+    val_loader = DataLoader(val_ds, batch_size=32, shuffle=False, collate_fn=protein_collate_fn)
+    test_loader = DataLoader(test_ds, batch_size=32, shuffle=False, collate_fn=protein_collate_fn)
+    for batch in train_loader:
         print(batch.shape)  # torch.Size([32, 800, 1024])
         break
