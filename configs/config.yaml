@@ -3,9 +3,9 @@ base:
   checkpoint_dir: checkpoints
 
 model:
-  name: aminoClust_100
+  name: aminoClust_21
   input_dim: 1024
-  num_clusters: 10
+  num_clusters: 21
   num_epochs: 200
   batch_size: 32
   learning_rate: 0.001
