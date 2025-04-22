@@ -3,3 +3,5 @@ __pycache__/
 slurm_output/
 checkpoints/
 tb_logs/
+outputs/
+plots/

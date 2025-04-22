@@ -1,8 +1,9 @@
 base:
   train_dir: data/output.txt
   checkpoint_dir: checkpoints
-  evaluation_dir: output
+  evaluation_dir: outputs
   log_dir: tb_logs
+  plot_dir: plots
 
 model:
   name: aminoClust
