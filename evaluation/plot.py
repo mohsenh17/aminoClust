@@ -95,7 +95,7 @@ if __name__ == "__main__":
         config = yaml.safe_load(f)
     for i in range (2,21):
         config['model']['name'] = f"aminoClust_{i}"
-        df  = pd.read_csv(config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv")[:400]
+        df  = pd.read_csv(config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv")[:800]
         df = aa_property(df)
         os.makedirs(config['base']['plot_dir'], exist_ok=True)
         cluster = ['charge', 'hydrophobicity', 'mass', 'property', 'cluster_id']

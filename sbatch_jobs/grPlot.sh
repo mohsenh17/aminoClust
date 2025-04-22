@@ -6,3 +6,4 @@
 
 source /home/mohsenh/projects/def-ilie/mohsenh/ENV/prostt5ENV/bin/activate
 python evaluation/plot.py
+sbatch grEval.sh
