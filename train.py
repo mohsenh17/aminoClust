@@ -5,24 +5,51 @@ from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.utils.tensorboard import SummaryWriter
 from models.amino_clust import VQVAE 
 
+aminoacid_str = [
+    "A", # Alanine
+    "C", # Cysteine
+    "D", # Aspartic acid
+    "E", # Glutamic acid
+    "F", # Phenylalanine
+    "G", # Glycine
+    "H", # Histidine
+    "I", # Isoleucine
+    "K", # Lysine
+    "L", # Leucine
+    "M", # Methionine
+    "N", # Asparagine
+    "P", # Proline
+    "Q", # Glutamine
+    "R", # Arginine
+    "S", # Serine
+    "T", # Threonine
+    "V", # Valine
+    "W", # Tryptophan
+    "Y" # Tyrosine
+]
+aminoacid_dict = {aminoacid: i+1 for i, aminoacid in enumerate(aminoacid_str)}#.update({"X": 0})  # X for unknown
+reversed_aminoacid_dict = {v: k for k, v in aminoacid_dict.items()}
+
 def prepare_data(config):
     input_dim = config['model']['input_dim']
     data_dir = config['base']['train_dir']
 
     embeddings = []
+    aas = []
     with open(data_dir, 'r') as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
-            _, vec = line.split(':')
+            aa, vec = line.split(':')
             vec_values = list(map(float, vec.strip().split()))
             if len(vec_values) != input_dim:
                 raise ValueError(f"Expected {input_dim} values, got {len(vec_values)}")
             embeddings.append(vec_values)
+            aas.append(aminoacid_dict[aa])
 
     embeddings = torch.tensor(embeddings, dtype=torch.float32)  # (L, 1024)
-    full_dataset = TensorDataset(embeddings)
+    full_dataset = TensorDataset(embeddings, torch.tensor(aas))
 
     total_len = len(full_dataset)
     train_len = int(0.8 * total_len)
@@ -116,4 +143,9 @@ if __name__ == "__main__":
     import yaml
     with open("configs/config.yaml", 'r') as f:
         config = yaml.safe_load(f)
-    train_model(config)
+    for i in range (2,21):
+        config['model']['name'] = f"aminoClust_{i}"
+        #config['base']['checkpoint_dir'] = f"checkpoints/{config['model']['name']}"
+        config['model']['num_clusters'] = i
+        os.makedirs(config['base']['checkpoint_dir'], exist_ok=True)
+        train_model(config)
