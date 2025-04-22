@@ -1,12 +1,14 @@
 base:
   train_dir: data/output.txt
   checkpoint_dir: checkpoints
+  evaluation_dir: output
+  log_dir: tb_logs
 
 model:
-  name: aminoClust_21
+  name: aminoClust
   input_dim: 1024
   num_clusters: 21
-  num_epochs: 200
+  num_epochs: 100
   batch_size: 32
   learning_rate: 0.001
   weight_decay: 0.0001

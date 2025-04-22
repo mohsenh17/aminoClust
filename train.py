@@ -78,7 +78,7 @@ def train_model(config):
     model = VQVAE(input_dim=input_dim, latent_dim=latent_dim, num_embeddings=num_embeddings).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     criterion = nn.MSELoss()
-    writer = SummaryWriter(log_dir=os.path.join("tb_logs", model_name))
+    writer = SummaryWriter(log_dir=os.path.join(config['base']['log_dir'], model_name))
 
     train_loader, val_loader, _ = prepare_data(config)
 
