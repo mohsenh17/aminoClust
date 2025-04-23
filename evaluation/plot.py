@@ -93,17 +93,26 @@ if __name__ == "__main__":
     import os
     with open("configs/config.yaml", 'r') as f:
         config = yaml.safe_load(f)
-    for i in range (2,21):
-        config['model']['name'] = f"aminoClust_{i}"
-        df  = pd.read_csv(config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv")[:800]
-        df = aa_property(df)
-        os.makedirs(config['base']['plot_dir'], exist_ok=True)
-        cluster = ['charge', 'hydrophobicity', 'mass', 'property', 'cluster_id']
-        for cluster in cluster:
-            # Create a directory for each cluster
-            os.makedirs(config['base']['plot_dir'] + f"/{config['model']['name']}", exist_ok=True)
-            # Save the plot with the cluster name
-            output_path = config['base']['plot_dir'] + f"/{config['model']['name']}/{config['model']['name']}_{cluster}.png"
-            plot_amino_acid_clusters(df, cluster=cluster, output_path=output_path)
-        
+    for j in [2, 4, 8, 16, 32, 64]:
+        config['model']['latent_dim'] = j
+        for i in range(2, 21):
+            config['model']['num_clusters'] = i
+            config['model']['name'] = f"aminoClust_{j}_{i}"
+            
+            tsne_path = config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv"
+            if os.path.exists(tsne_path):
+                print(f'tsne for {config['model']['name']} exist!')
+                continue
+
+            df = pd.read_csv(tsne_path)[:2000]
+            df = aa_property(df)
+
+            cluster_features = ['charge', 'hydrophobicity', 'mass', 'property', 'cluster_id']
+            plot_subdir = config['base']['plot_dir'] + f"/{config['model']['name']}"
+            os.makedirs(plot_subdir, exist_ok=True)
+
+            for cluster in cluster_features:
+                output_path = f"{plot_subdir}/{config['model']['name']}_{cluster}.png"
+                plot_amino_acid_clusters(df, cluster=cluster, output_path=output_path)
+    
     

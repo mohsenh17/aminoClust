@@ -54,6 +54,9 @@ if __name__ == "__main__":
             config['model']['name'] = f"aminoClust_{config['model']['latent_dim']}_{i}"
             config['model']['num_clusters'] = i
             checkpoint_path = config['base']['checkpoint_dir'] + f"/{config['model']['name']}.pth"
+            if os.path.exists(checkpoint_path):
+                print(f'checkpoint for {config['model']['name']} exist!')
+                continue
             checkpoint = torch.load(checkpoint_path, map_location=device)
             output_file = config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv"
             os.makedirs(config['base']['evaluation_dir'], exist_ok=True)
@@ -62,6 +65,6 @@ if __name__ == "__main__":
             train_loader, val_loader, test_loader = prepare_data(config)
 
             model.load_state_dict(checkpoint)
-            latents, cluster_ids, labels = process_latents(model, test_loader, device, output_file, n_samples=1000)
+            latents, cluster_ids, labels = process_latents(model, test_loader, device, n_samples=1000)
             apply_tsne_and_create_dataframe(latents, cluster_ids, labels, output_file)
 

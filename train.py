@@ -143,10 +143,13 @@ if __name__ == "__main__":
     import yaml
     with open("configs/config.yaml", 'r') as f:
         config = yaml.safe_load(f)
-    for j in [2,4,8,16,32,64]:
+    for j in [4,8,16,32,64]:
         config['model']['latent_dim'] = j
         for i in range (2,21):
             config['model']['name'] = f"aminoClust_{config['model']['latent_dim']}_{i}"
             config['model']['num_clusters'] = i
+            if os.path.exists(config['base']['checkpoint_dir'] + f"/{config['model']['name']}.pth"):
+                print(f'checkpoint for {config["model"]["name"]} exist!')
+                continue
             os.makedirs(config['base']['checkpoint_dir'], exist_ok=True)
             train_model(config)
