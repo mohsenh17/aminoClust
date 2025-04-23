@@ -27,11 +27,6 @@ def aa_property(dataframe):
     dataframe['property'] = dataframe['label'].map(propertyDict)
     return dataframe
     
-
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.lines as mlines
-
 def plot_amino_acid_clusters(dataframe, cluster='unique', output_path="custom_markers_plot.png"):
     """
     Plots 2D embeddings of amino acids with custom markers and colors per cluster,
@@ -101,7 +96,7 @@ if __name__ == "__main__":
             
             tsne_path = config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv"
             if os.path.exists(tsne_path):
-                print(f'tsne for {config['model']['name']} exist!')
+                print(f"tsne for {config['model']['name']} exist!")
                 continue
 
             df = pd.read_csv(tsne_path)[:2000]

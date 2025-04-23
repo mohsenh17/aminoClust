@@ -55,7 +55,7 @@ if __name__ == "__main__":
             config['model']['num_clusters'] = i
             checkpoint_path = config['base']['checkpoint_dir'] + f"/{config['model']['name']}.pth"
             if os.path.exists(checkpoint_path):
-                print(f'checkpoint for {config['model']['name']} exist!')
+                print(f"checkpoint for {config['model']['name']} exist!")
                 continue
             checkpoint = torch.load(checkpoint_path, map_location=device)
             output_file = config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv"
