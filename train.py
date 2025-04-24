@@ -49,12 +49,13 @@ def prepare_data(config):
             embeddings.append(vec_values)
             aas.append(aminoacid_dict[aa])
 
-    embeddings = torch.tensor(embeddings, dtype=torch.float32)  # (L, 1024)
-    full_dataset = TensorDataset(embeddings, torch.tensor(aas))
-    return full_dataset
+    return embeddings, aas
 
 def data_loader(config):
-    full_dataset = prepare_data(config)
+    embeddings, aas = prepare_data(config)
+    
+    embeddings = torch.tensor(embeddings, dtype=torch.float32)
+    full_dataset = TensorDataset(embeddings, torch.tensor(aas))
     total_len = len(full_dataset)
     train_len = int(0.8 * total_len)
     val_len = int(0.1 * total_len)
