@@ -33,7 +33,7 @@ if __name__ == "__main__":
     import os
     import torch
     from models.amino_clust import VQVAE
-    from train import prepare_data, reversed_aminoacid_dict
+    from utils import prepare_data, reversed_aminoacid_dict
     with open("configs/config.yaml", 'r') as f:
         config = yaml.safe_load(f)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

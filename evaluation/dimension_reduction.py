@@ -3,7 +3,7 @@ sys.path.insert(0, '.')
 from sklearn.manifold import TSNE
 import torch
 from models.amino_clust import VQVAE 
-from train import prepare_data, reversed_aminoacid_dict
+from utils import prepare_data, reversed_aminoacid_dict
 import pandas as pd
 
 
@@ -33,10 +33,15 @@ def process_latents(model, dataloader, device, n_samples=3):
 def apply_tsne_and_create_dataframe(latents, cluster_ids, labels, output_file):
     
     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
-    latents_2d = tsne.fit_transform(latents.numpy())
+    if hasattr(latents, 'detach'):
+        latents = latents.numpy()
+    if hasattr(cluster_ids, 'detach'):
+        cluster_ids = cluster_ids.numpy()
+   
+    latents_2d = tsne.fit_transform(latents)
 
     df = pd.DataFrame(latents_2d, columns=['x', 'y'])
-    df['cluster_id'] = cluster_ids.numpy()
+    df['cluster_id'] = cluster_ids
     df['label'] = pd.Series(labels).map(reversed_aminoacid_dict)
     df.to_csv(output_file, index=False)
 
