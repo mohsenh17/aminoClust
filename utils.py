@@ -1,4 +1,5 @@
 import os
+import numpy as np
 aminoacid_str = [
     "A", # Alanine
     "C", # Cysteine
@@ -42,7 +43,7 @@ def prepare_data(config):
             embeddings.append(vec_values)
             aas.append(aminoacid_dict[aa])
 
-    return embeddings, aas
+    return np.array(embeddings), np.array(aas)
 
 def data_loader(config):
     import torch
