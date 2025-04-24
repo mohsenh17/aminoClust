@@ -3,7 +3,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.utils.tensorboard import SummaryWriter
-from models.amino_clust import VQVAE 
+#from models.amino_clust import VQVAE 
+from models.amino_clust_dense import VQVAE 
 
 aminoacid_str = [
     "A", # Alanine
@@ -50,7 +51,10 @@ def prepare_data(config):
 
     embeddings = torch.tensor(embeddings, dtype=torch.float32)  # (L, 1024)
     full_dataset = TensorDataset(embeddings, torch.tensor(aas))
+    return full_dataset
 
+def data_loader(config):
+    full_dataset = prepare_data(config)
     total_len = len(full_dataset)
     train_len = int(0.8 * total_len)
     val_len = int(0.1 * total_len)
@@ -80,7 +84,7 @@ def train_model(config):
     criterion = nn.MSELoss()
     writer = SummaryWriter(log_dir=os.path.join(config['base']['log_dir'], model_name))
 
-    train_loader, val_loader, _ = prepare_data(config)
+    train_loader, val_loader, _ = data_loader(config)
 
     best_val_loss = float("inf")
 
@@ -143,13 +147,11 @@ if __name__ == "__main__":
     import yaml
     with open("configs/config.yaml", 'r') as f:
         config = yaml.safe_load(f)
-    for j in [4,8,16,32,64]:
-        config['model']['latent_dim'] = j
-        for i in range (2,21):
-            config['model']['name'] = f"aminoClust_{config['model']['latent_dim']}_{i}"
-            config['model']['num_clusters'] = i
-            if os.path.exists(config['base']['checkpoint_dir'] + f"/{config['model']['name']}.pth"):
-                print(f'checkpoint for {config["model"]["name"]} exist!')
-                continue
-            os.makedirs(config['base']['checkpoint_dir'], exist_ok=True)
-            train_model(config)
+    for i in range (2,21):
+        config['model']['name'] = f"aminoClust_dense_{config['model']['latent_dim']}_{i}"
+        config['model']['num_clusters'] = i
+        if os.path.exists(config['base']['checkpoint_dir'] + f"/{config['model']['name']}.pth"):
+            print(f'checkpoint for {config["model"]["name"]} exist!')
+            continue
+        os.makedirs(config['base']['checkpoint_dir'], exist_ok=True)
+        train_model(config)
