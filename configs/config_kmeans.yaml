@@ -1,0 +1,9 @@
+base:
+  train_dir: data/output.txt
+  evaluation_dir: outputs/amino_kmeans
+  plot_dir: plots/amino_kmeans
+
+model:
+  name: amino_kmeans
+  input_dim: 1024
+  num_clusters: 2

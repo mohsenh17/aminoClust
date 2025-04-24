@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patches as mpatches
+import yaml
+import os
 
 def aa_property(dataframe):
     chargeDict = {'A':'Neutral','G':'Neutral','I':'Neutral','L':'Neutral','P':'Neutral',
@@ -83,31 +85,70 @@ def plot_amino_acid_clusters(dataframe, cluster='unique', output_path="custom_ma
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-if __name__ == "__main__":
-    import yaml
-    import os
-    with open("configs/config.yaml", 'r') as f:
+
+
+def plot_kmeans_reference_results(config_path="configs/config_kmeans.yaml"):
+    """
+    Plots clustering results for the KMeans reference model.
+    """
+    with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
-    for j in [2, 4, 8, 16, 32, 64]:
-        config['model']['latent_dim'] = j
-        for i in range(2, 21):
-            config['model']['num_clusters'] = i
-            config['model']['name'] = f"aminoClust_{j}_{i}"
-            
-            tsne_path = config['base']['evaluation_dir'] + f"/tsne_latents_{config['model']['name']}.csv"
+
+    cluster_features = ['charge', 'hydrophobicity', 'mass', 'property', 'cluster_id']
+    plot_subdir = config['base']['plot_dir']
+    os.makedirs(plot_subdir, exist_ok=True)
+
+    df = pd.read_csv(os.path.join(config['base']['data_dir'], "kmeans_results.csv"))
+    df = aa_property(df)
+
+    for cluster in cluster_features:
+        output_path = os.path.join(plot_subdir, f"{cluster}.png")
+        plot_amino_acid_clusters(df, cluster=cluster, output_path=output_path)
+
+def plot_model_variants_results(config_path="configs/config.yaml"):
+    """
+    Iterates over different latent dimensions and cluster numbers to plot clustering results.
+    """
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    cluster_features = ['charge', 'hydrophobicity', 'mass', 'property', 'cluster_id']
+
+    for latent_dim in [2, 4, 8, 16, 32, 64]:
+        config['model']['latent_dim'] = latent_dim
+
+        for num_clusters in range(2, 21):
+            config['model']['num_clusters'] = num_clusters
+            config['model']['name'] = f"aminoClust_{latent_dim}_{num_clusters}"
+
+            tsne_path = os.path.join(
+                config['base']['evaluation_dir'],
+                f"tsne_latents_{config['model']['name']}.csv"
+            )
+
             if os.path.exists(tsne_path):
-                print(f"tsne for {config['model']['name']} exist!")
+                print(f"t-SNE for {config['model']['name']} exists!")
                 continue
 
             df = pd.read_csv(tsne_path)[:2000]
             df = aa_property(df)
 
-            cluster_features = ['charge', 'hydrophobicity', 'mass', 'property', 'cluster_id']
-            plot_subdir = config['base']['plot_dir'] + f"/{config['model']['name']}"
+            plot_subdir = os.path.join(config['base']['plot_dir'], config['model']['name'])
             os.makedirs(plot_subdir, exist_ok=True)
 
             for cluster in cluster_features:
-                output_path = f"{plot_subdir}/{config['model']['name']}_{cluster}.png"
+                output_path = os.path.join(
+                    plot_subdir,
+                    f"{config['model']['name']}_{cluster}.png"
+                )
                 plot_amino_acid_clusters(df, cluster=cluster, output_path=output_path)
-    
-    
+
+
+if __name__ == "__main__":
+    import sys
+    if sys.argv[1] == "kmeans":
+        plot_kmeans_reference_results()
+    elif sys.argv[1] == "vqvae":
+        plot_model_variants_results()
+    else:
+        raise ValueError("Invalid argument.")
