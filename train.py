@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader, TensorDataset, random_split
 from torch.utils.tensorboard import SummaryWriter
 #from models.amino_clust import VQVAE 
 from models.amino_clust_dense import VQVAE 
+from utils import data_loader
 
 
 def train_model(config):
